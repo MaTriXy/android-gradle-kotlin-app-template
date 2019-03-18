@@ -2,7 +2,6 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![TravisCI OSX Build](https://img.shields.io/travis/jaredsburrows/android-gradle-kotlin-app-template/master.svg)](https://travis-ci.org/jaredsburrows/android-gradle-kotlin-app-template)
-[![Coveralls Code Coverage](https://img.shields.io/coveralls/jaredsburrows/android-gradle-kotlin-app-template/master.svg?label=Code%20Coverage)](https://coveralls.io/github/jaredsburrows/android-gradle-kotlin-app-template?branch=master)
 [![Twitter Follow](https://img.shields.io/twitter/follow/jaredsburrows.svg?style=social)](https://twitter.com/jaredsburrows)
 
 Gradle + Android Studio + Robolectric + Espresso + JaCoCo
