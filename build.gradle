@@ -1,154 +1,131 @@
 buildscript {
-  apply from: rootProject.file("gradle/dependencies.gradle")
+    apply from: rootProject.file("gradle/dependencies.gradle")
 
-  repositories {
-    google()
-    maven { url "https://plugins.gradle.org/m2/" }
-  }
+    repositories {
+        google()
+        gradlePluginPortal()
+    }
 
-  dependencies {
-    classpath "com.gradle:build-scan-plugin:1.9"
-    classpath "com.android.tools.build:gradle:2.3.3"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.51"
-    classpath "com.novoda:gradle-android-command-plugin:1.7.1"
-    classpath "com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.1"
-    classpath "com.vanniktech:gradle-android-apk-size-plugin:0.4.0"
-    classpath "com.github.triplet.gradle:play-publisher:1.2.0"
-    classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
-    classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.10"
-    classpath "com.github.ben-manes:gradle-versions-plugin:0.15.0"
-  }
+    dependencies {
+        classpath "com.gradle:build-scan-plugin:2.2.1"
+        classpath "com.android.tools.build:gradle:3.3.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21"
+        classpath "com.novoda:gradle-android-command-plugin:2.0.1"
+        classpath "com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6"
+        classpath "com.vanniktech:gradle-android-apk-size-plugin:0.4.0"
+        classpath "com.github.triplet.gradle:play-publisher:2.1.1"
+        classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.7.1"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.21.0"
+    }
 }
 
 repositories {
-  google()
-  maven { url "https://plugins.gradle.org/m2/" }
+    google()
+    gradlePluginPortal()
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = "4.1"
-  distributionType = Wrapper.DistributionType.ALL
-}
-
-apply from: rootProject.file("gradle/scan.gradle")
+apply from: "gradle/scan.gradle"
 apply plugin: "com.android.application"
-apply plugin: "kotlin-android"
-apply plugin: "kotlin-kapt"
-apply plugin: "android-command"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.novoda.android-command"
 apply plugin: "com.getkeepsafe.dexcount"
 apply plugin: "com.vanniktech.android.apk.size"
-apply plugin: "net.ltgt.errorprone"
 apply plugin: "com.github.ben-manes.versions"
-apply from: rootProject.file("gradle/compile.gradle")
-apply from: rootProject.file("gradle/quality.gradle")
-apply from: rootProject.file("gradle/publish.gradle")
+apply from: "gradle/compile.gradle"
+apply from: "gradle/quality.gradle"
+apply from: "gradle/publish.gradle"
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
-  defaultConfig {
-    applicationId "burrows.apps.example.template"
-    versionCode 1
-    versionName "1.0"
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    resConfigs "en" // Keep only english resource files for now
-    vectorDrawables.useSupportLibrary = true
-  }
-
-  compileOptions {
-    sourceCompatibility rootProject.ext.javaVersion
-    targetCompatibility rootProject.ext.javaVersion
-  }
-
-  aaptOptions.cruncherEnabled rootProject.ext.ci
-
-  dexOptions.preDexLibraries !rootProject.ext.ci
-
-  sourceSets {
-    androidTest.java.srcDirs += "src/androidTest/kotlin"
-    main.java.srcDirs += "src/main/kotlin"
-    test.java.srcDirs += "src/test/kotlin"
-  }
-
-  signingConfigs {
-    debug {
-      storeFile rootProject.file("./.buildscript/debug.keystore")
-      storePassword "android"
-      keyAlias "androiddebugkey"
-      keyPassword "android"
+    defaultConfig {
+        applicationId "burrows.apps.example.template"
+        versionCode 1
+        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resConfigs "en" // Keep only english resource files for now
+        vectorDrawables.useSupportLibrary = true
     }
-  }
 
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFile getDefaultProguardFile("proguard-android-optimize.txt")
-      proguardFile "proguard-rules.pro"
-      signingConfig signingConfigs.debug
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
     }
-  }
 
-  lintOptions {
-    textOutput "stdout"
-    checkAllWarnings true
-    warningsAsErrors true
-    disable "UnusedResources" // Unused will be removed on release
-    disable "IconExpectedSize" // Using the material icons provided from Google
-    disable "GoogleAppIndexingApiWarning" // We might want to index our app later
-    disable "InvalidPackage" // Butterknife, Okio and Realm
-    disable "ResourceType" // Annotation binding
-    disable "GradleDependency"
-    disable "NewerVersionAvailable"
-  }
+    aaptOptions.cruncherEnabled rootProject.ext.ci
 
-  testOptions {
-    animationsDisabled = true
+    dexOptions.preDexLibraries !rootProject.ext.ci
 
-    unitTests {
-      returnDefaultValues = true
-
-      all {
-        jacoco {
-          includeNoLocationClasses = true
+    signingConfigs {
+        debug {
+            storeFile file(".buildscript/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
         }
-      }
     }
-  }
 
-  packagingOptions {
-    exclude "**/*.txt"
-    exclude "**/*.xml"
-    exclude "**/*.properties"
-  }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFile getDefaultProguardFile("proguard-android-optimize.txt")
+            proguardFile "proguard-rules.pro"
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    lintOptions {
+        textOutput "stdout"
+        checkAllWarnings true
+        warningsAsErrors true
+        disable "UnusedResources" // Unused will be removed on release
+        disable "IconExpectedSize" // Using the material icons provided from Google
+        disable "GoogleAppIndexingApiWarning" // We might want to index our app later
+        disable "InvalidPackage" // Butterknife, Okio and Realm
+        disable "ResourceType" // Annotation binding
+        disable "GradleDependency"
+        disable "NewerVersionAvailable"
+    }
+
+    testOptions {
+        animationsDisabled = true
+
+        unitTests {
+            returnDefaultValues = true
+        }
+    }
+
+    packagingOptions {
+        exclude "**/*.txt"
+        exclude "**/*.xml"
+        exclude "**/*.properties"
+    }
 }
 
-def supportLibraryVersion = "26.1.0"
+def supportLibraryVersion = "28.0.0"
 def espressoVersion = "3.0.1"
 
 configurations.all {
-  resolutionStrategy.force "com.android.support:support-annotations:$supportLibraryVersion"
+    resolutionStrategy.force "com.android.support:support-annotations:$supportLibraryVersion"
 }
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.51"
-  compile "com.android.support:design:$supportLibraryVersion"
-  compile "com.google.dagger:dagger:2.11"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.1.51"
+    implementation "com.android.support:design:$supportLibraryVersion"
 
-  kapt "com.google.dagger:dagger-compiler:2.11"
+    androidTestImplementation "com.android.support:support-annotations:$supportLibraryVersion"
+    androidTestImplementation "com.android.support.test:runner:1.0.1"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espressoVersion", { exclude group: "com.android.support" }
 
-  androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
-  androidTestCompile "com.android.support.test:runner:1.0.1"
-  androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoVersion"
-  androidTestCompile "com.android.support.test.espresso:espresso-intents:$espressoVersion"
-  androidTestCompile "com.android.support.test.espresso:espresso-contrib:$espressoVersion", { exclude group: "com.android.support" }
-
-  testCompile "junit:junit:4.12"
-  testCompile "org.mockito:mockito-inline:2.10.0"
-  testCompile "org.robolectric:shadows-support-v4:3.2.2"
-  testCompile "org.khronos:opengl-api:gl1.1-android-2.1_r1"
-  testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-  testCompile "org.assertj:assertj-core:1.7.1"
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-inline:2.10.0"
+    testImplementation "org.robolectric:shadows-support-v4:3.2.2"
+    testImplementation "org.khronos:opengl-api:gl1.1-android-2.1_r1"
+    testImplementation "com.android.support:support-annotations:$supportLibraryVersion"
+    testImplementation "org.assertj:assertj-core:1.7.1"
 }
